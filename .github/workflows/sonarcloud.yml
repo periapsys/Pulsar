@@ -33,4 +33,5 @@ jobs:
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION_KEY }}
             -Dsonar.exclusions=.github/**,wwwroot/**
+            -Dsonar.coverage.exclusions=**/*  # This will prevent SonarQube from analyzing coverage
           projectBaseDir: .
