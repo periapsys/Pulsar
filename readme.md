@@ -96,3 +96,6 @@ To deploy **Pulsar** to Azure, follow the steps below:
 - Post-Deployment:
   - Monitor the deployment and ensure that the chatbot is running as expected.
   - If any issues arise, refer to the **Azure Application Insights** logs or Azure DevOps build logs for troubleshooting.
+ 
+## Misc
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=periapsys_Pulsar)](https://sonarcloud.io/summary/new_code?id=periapsys_Pulsar)
