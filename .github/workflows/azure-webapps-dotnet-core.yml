@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
@@ -28,10 +28,10 @@ jobs:
         run: dotnet publish --configuration Release --output ./publish
 
       - name: FTP Deployment to Azure
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          ftp-server: ${{ secrets.AZURE_FTP_SERVER }}
-          ftp-username: ${{ secrets.AZURE_FTP_USERNAME }}
-          ftp-password: ${{ secrets.AZURE_FTP_PASSWORD }}
+          server: ${{ secrets.AZURE_FTP_SERVER }}
+          username: ${{ secrets.AZURE_FTP_USERNAME }}
+          password: ${{ secrets.AZURE_FTP_PASSWORD }}
           local-dir: ./publish
           server-dir: /site/wwwroot
