@@ -17,6 +17,7 @@ namespace PERI.SK.Infrastructure.AzureOpenAi
             {
                 var builder = Kernel.CreateBuilder();
                 builder.AddAzureOpenAIChatCompletion(model!, endpoint!, apiKey!);
+                builder.AddLocalTextEmbeddingGeneration();
                 return builder.Build();
             });
 

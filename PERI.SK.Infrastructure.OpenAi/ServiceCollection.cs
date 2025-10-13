@@ -16,6 +16,7 @@ namespace PERI.SK.Infrastructure.OpenAi
             {
                 var builder = Kernel.CreateBuilder();
                 builder.AddOpenAIChatCompletion(model!, apiKey!);
+                builder.AddLocalTextEmbeddingGeneration();
                 return builder.Build();
             });
 

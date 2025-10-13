@@ -1,12 +1,14 @@
-using PERI.SK.Application.Conversations.Queries;
-using PERI.SK.Infrastructure;
-using PERI.SK.Infrastructure.Data;
-using PERI.SK.Infrastructure.DeepSeek;
-using PERI.SK.Web;
-using PERI.SK.Web.Components;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
+using PERI.SK.Application.Conversations.Queries;
+using PERI.SK.Infrastructure;
+using PERI.SK.Infrastructure.AzureOpenAi;
+using PERI.SK.Infrastructure.Data;
+using PERI.SK.Infrastructure.DeepSeek;
+using PERI.SK.Infrastructure.OpenAi;
+using PERI.SK.Web.Components;
+using PERI.SK.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +17,20 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.ApplyInfrastructureServiceCollection(builder.Configuration);
-builder.Services.ApplyDataServiceCollection(builder.Configuration);
-builder.Services.ApplyDeepSeekServiceCollection(builder.Configuration);
+builder.Services.ApplyDataServiceCollection(builder.Configuration); var aiPlatform = builder.Configuration["AiPlatform:Platform"];
+
+if (aiPlatform == "OpenAI")
+{
+    builder.Services.ApplyOpenAiServiceCollection(builder.Configuration);
+}
+else if (aiPlatform == "AzureOpenAI")
+{
+    builder.Services.ApplyAzureOpenAiServiceCollection(builder.Configuration);
+}
+else
+{
+    builder.Services.ApplyDeepSeekServiceCollection(builder.Configuration);
+}
 
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<GetResponseQuery>());
 
