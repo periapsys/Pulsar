@@ -13,11 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0'
-
       - name: Restore dependencies
         run: dotnet restore
 
@@ -27,11 +22,87 @@ jobs:
       - name: Publish the application
         run: dotnet publish --configuration Release --output ./publish
 
-      - name: FTP Deployment to Azure
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.AZURE_FTP_SERVER }}
-          username: ${{ secrets.AZURE_FTP_USERNAME }}
-          password: ${{ secrets.AZURE_FTP_PASSWORD }}
-          local-dir: ./publish/
-          server-dir: /site/wwwroot/
+      - name: Create app_offline.htm
+        run: |
+          mkdir -p offline
+          echo '<html><head><title>Site Offline</title></head><body><h1>Site is offline for maintenance.</h1></body></html>' > offline/app_offline.htm
+
+      - name: Check and install lftp
+        run: |
+          echo "Checking if lftp is installed..."
+          if ! command -v lftp &> /dev/null; then
+            echo "lftp not found, installing..."
+            sudo apt-get update && sudo apt-get install -y lftp
+          else
+            echo "✅ lftp is already installed"
+            lftp --version
+          fi
+
+      - name: Upload app_offline.htm via lftp
+        env:
+          AZURE_FTP_SERVER: ${{ secrets.AZURE_FTP_SERVER }}
+          AZURE_FTP_USERNAME: ${{ secrets.AZURE_FTP_USERNAME }}
+          AZURE_FTP_PASSWORD: ${{ secrets.AZURE_FTP_PASSWORD }}
+        run: |
+          echo "Uploading app_offline.htm to put site in maintenance mode..."
+          lftp -c "
+          set ftp:ssl-allow no;
+          set file:use-fallocate no;
+          set ftp:use-site-chmod no;
+          set ftp:use-site-utime no;
+          open -u $AZURE_FTP_USERNAME,$AZURE_FTP_PASSWORD $AZURE_FTP_SERVER;
+          cd /site/wwwroot;
+          put ./offline/app_offline.htm;
+          quit
+          "
+
+      - name: Clean config files from publish folder
+        run: |
+          rm -f ./publish/web.config
+          rm -f ./publish/appsettings.config
+          rm -f ./publish/appsettings.*.config || true
+
+      - name: Upload application files via lftp
+        env:
+          AZURE_FTP_SERVER: ${{ secrets.AZURE_FTP_SERVER }}
+          AZURE_FTP_USERNAME: ${{ secrets.AZURE_FTP_USERNAME }}
+          AZURE_FTP_PASSWORD: ${{ secrets.AZURE_FTP_PASSWORD }}
+        run: |
+          echo "Uploading application files to FTP server..."
+          lftp -c "
+          set ftp:ssl-allow no;
+          set file:use-fallocate no;
+          set ftp:use-site-chmod no;
+          set ftp:use-site-utime no;
+          set ftp:use-site-utime2 no;
+          set ftp:use-site-idle no;
+          set ftp:use-epsv no;
+          set ftp:prefer-epsv no;
+          set ftp:use-feat no;
+          set file:use-mff no;
+          set net:max-retries 2;
+          open -u $AZURE_FTP_USERNAME,$AZURE_FTP_PASSWORD $AZURE_FTP_SERVER;
+          cd /site/wwwroot;
+          mirror -R --only-newer --no-perms --ignore-time ./publish/ . 2>/dev/null || mirror -R --only-newer --no-perms ./publish/ .;
+          quit
+          "
+          echo "✅ All files uploaded successfully!"
+
+      - name: Remove app_offline.htm via lftp
+        env:
+          AZURE_FTP_SERVER: ${{ secrets.AZURE_FTP_SERVER }}
+          AZURE_FTP_USERNAME: ${{ secrets.AZURE_FTP_USERNAME }}
+          AZURE_FTP_PASSWORD: ${{ secrets.AZURE_FTP_PASSWORD }}
+        run: |
+          echo "Removing app_offline.htm to bring site back online..."
+          lftp -c "
+          set ftp:ssl-allow no;
+          set file:use-fallocate no;
+          set ftp:use-site-chmod no;
+          set ftp:use-site-utime no;
+          open -u $AZURE_FTP_USERNAME,$AZURE_FTP_PASSWORD $AZURE_FTP_SERVER;
+          cd /site/wwwroot;
+          rm -f app_offline.htm;
+          quit
+          " || echo "Warning: Could not remove app_offline.htm, continuing..."
+          echo "✅ Deployment complete - site should be back online!"
