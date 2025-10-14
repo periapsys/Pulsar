@@ -39,7 +39,8 @@ These instructions will get you a copy of the project up and running on your loc
         "AiPlatform": {
             "Model": "[MODEL OR DEPLOYMENT NAME]",
             "Endpoint": "[ENDPOINT]",
-            "ApiKey": "[KEY]"
+            "ApiKey": "[KEY]",
+            "Platform": "[SUPPORTED PLATFORM (see AiPlatform enum)]"
         },
         "ReferenceData": [
           {
