@@ -56,11 +56,10 @@ jobs:
           quit
           "
 
-      - name: Clean config files from publish folder
+      - name: Wait for app offline to take effect
         run: |
-          rm -f ./publish/web.config
-          rm -f ./publish/appsettings.config
-          rm -f ./publish/appsettings.*.config || true
+          echo "Waiting 10 seconds for app_offline.htm to stop the application..."
+          sleep 10
 
       - name: Upload application files via lftp
         env:
@@ -68,25 +67,19 @@ jobs:
           AZURE_FTP_USERNAME: ${{ secrets.AZURE_FTP_USERNAME }}
           AZURE_FTP_PASSWORD: ${{ secrets.AZURE_FTP_PASSWORD }}
         run: |
-          echo "Uploading application files to FTP server..."
+          echo "Uploading application files to FTP server (preserving configs)..."
           lftp -c "
           set ftp:ssl-allow no;
           set file:use-fallocate no;
           set ftp:use-site-chmod no;
           set ftp:use-site-utime no;
-          set ftp:use-site-utime2 no;
-          set ftp:use-site-idle no;
-          set ftp:use-epsv no;
-          set ftp:prefer-epsv no;
-          set ftp:use-feat no;
-          set file:use-mff no;
           set net:max-retries 2;
           open -u $AZURE_FTP_USERNAME,$AZURE_FTP_PASSWORD $AZURE_FTP_SERVER;
           cd /site/wwwroot;
-          mirror -R --only-newer --no-perms --ignore-time ./publish/ . 2>/dev/null || mirror -R --only-newer --no-perms ./publish/ .;
+          mirror -R --no-perms --exclude appsettings.json --exclude web.config --exclude appsettings.*.json ./publish/ . 2>/dev/null || mirror -R --no-perms --exclude appsettings.json --exclude web.config ./publish/ .;
           quit
           "
-          echo "✅ All files uploaded successfully!"
+          echo "✅ All files uploaded and replaced successfully!"
 
       - name: Remove app_offline.htm via lftp
         env:
