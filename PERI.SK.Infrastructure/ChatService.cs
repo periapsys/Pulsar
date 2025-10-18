@@ -33,7 +33,8 @@ namespace PERI.SK.Infrastructure
             _functionDictionary = new()
             {
                 { nameof(ReferenceDataType.Sql).ToLower(), ProcessSql },
-                { nameof(ReferenceDataType.Pdf).ToLower(), ProcessPdf }
+                { nameof(ReferenceDataType.Pdf).ToLower(), ProcessPdf },
+                { nameof(ReferenceDataType.Excel).ToLower(), ProcessExcel }
             };
         }
 

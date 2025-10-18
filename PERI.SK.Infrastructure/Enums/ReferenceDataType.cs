@@ -3,6 +3,7 @@
     public enum ReferenceDataType
     {
         Sql,
-        Pdf
+        Pdf,
+        Excel
     }
 }

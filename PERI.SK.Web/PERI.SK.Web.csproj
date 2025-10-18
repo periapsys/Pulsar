@@ -4,14 +4,14 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	<Version>0.2.4.1</Version>
+	<Version>0.2.6.0</Version>
   </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-		<PackageReference Include="Markdig" Version="0.41.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
-		<PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.49.0" />
+		<PackageReference Include="Markdig" Version="0.42.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+		<PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.66.0" />
 	</ItemGroup>
 
 	<ItemGroup>
