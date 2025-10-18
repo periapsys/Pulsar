@@ -9,6 +9,7 @@ namespace PERI.SK.Infrastructure.Data
         {
             services.AddScoped<SqlQueries>();
             services.AddScoped<PdfQueries>();
+            services.AddScoped<ExcelQueries>();
         }
     }
 }
