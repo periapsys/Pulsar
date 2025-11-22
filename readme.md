@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Technology Used
 
-- [.Net 9](https://www.microsoft.com/net/download/windows)
+- [.Net 10](https://www.microsoft.com/net/download/windows)
 - [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
 - [Bootstrap 5.3](https://getbootstrap.com)
 - [Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/overview/)
