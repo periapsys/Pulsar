@@ -1,16 +1,58 @@
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using PERI.SK.Application.Conversations.Queries;
 using PERI.SK.Infrastructure;
 using PERI.SK.Infrastructure.AzureOpenAi;
 using PERI.SK.Infrastructure.Data;
 using PERI.SK.Infrastructure.DeepSeek;
 using PERI.SK.Infrastructure.OpenAi;
-using PERI.SK.Web.Components;
 using PERI.SK.Web;
+using PERI.SK.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Configuration.GetSection("OIDCSettings").Exists())
+{
+    // Real OIDC configuration
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    })
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+    {
+        builder.Configuration.GetSection("OIDCSettings").Bind(options);
+        options.ResponseType = "code";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.RequireSignedTokens = false;
+        options.GetClaimsFromUserInfoEndpoint = true;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            RequireSignedTokens = false,
+
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
+
+        options.ProtocolValidator.RequireNonce = false;
+    });
+}
+else
+{
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddScheme<AuthenticationSchemeOptions, NoAuthHandler>(CookieAuthenticationDefaults.AuthenticationScheme, options => { });
+}
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -63,6 +105,8 @@ app.UseHealthChecks("/hc", new HealthCheckOptions()
 });
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAntiforgery();
 
