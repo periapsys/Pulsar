@@ -1,6 +1,6 @@
 {
   "context": "You are a helpful assistant that explains things about {0}",
-  "greeting": "Hi there! I am Eya! How can I assist you today? Feel free to ask any questions about ",
+  "greeting": "Hi, {0}! I am Eya! How can I assist you today? Feel free to ask any questions about ",
   "is_classified": "Please classify the query into one of the following categories: {0}. If the topic doesn't clearly belong to any of these categories, respond with 'None'. Otherwise, respond with the appropriate category. Query: {1}. Do not provide any explanation, and remove any additional formatting.",
   "not_classified": "Please reply with a greeting and say anything that corresponds to the query: {0}. Do not reply 'None' this time.",
   "generate_sql": "{0}\nHere are the columns in your database. Left is the table, right is field.\nGenerate me MS SQL code for the following question using the information about my database. Query: {1}. This time please reply with SQL syntax with the correct table.",
