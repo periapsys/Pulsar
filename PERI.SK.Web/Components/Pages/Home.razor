@@ -1,12 +1,14 @@
 ﻿@page "/"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using PERI.SK.Application.Conversations.Queries
 @using PERI.SK.Domain.Interfaces
 @using Markdig
 @using MediatR
 @inject IMediator Mediator
 @inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Chat with Pulsar</PageTitle>
 
@@ -76,10 +78,24 @@
 
     protected override async Task OnInitializedAsync()
     {
-        greetingMessage = await Mediator.Send(new GetPromptQuery { Key = "greeting" });
+        // 1. Get the greeting template
+        var template = await Mediator.Send(new GetPromptQuery { Key = "greeting" });
 
+        // 2. Get username from authentication state (fallback to "there")
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var username = authState.User?.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            username = "there";
+        }
+
+        // 3. Format the template with the username
+        greetingMessage = string.Format(template ?? string.Empty, username);
+
+        // 4. Append subjects (bolded in Markdown)
         var subjects = string.Join(", ", await Mediator.Send(new GetSubjectsQuery()));
         greetingMessage = $"{greetingMessage} **{subjects}**.";
+
         StateHasChanged();
     }
 

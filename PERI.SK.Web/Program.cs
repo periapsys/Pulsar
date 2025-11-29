@@ -43,6 +43,20 @@ if (builder.Configuration.GetSection("OIDCSettings").Exists())
         };
 
         options.ProtocolValidator.RequireNonce = false;
+
+        options.Events = new OpenIdConnectEvents
+        {
+            OnRemoteFailure = context =>
+            {
+                // Prevent the default error handler
+                context.HandleResponse();
+
+                // Redirect user back to root
+                context.Response.Redirect("/");
+
+                return Task.CompletedTask;
+            }
+        };
     });
 }
 else

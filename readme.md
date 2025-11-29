@@ -51,6 +51,12 @@ These instructions will get you a copy of the project up and running on your loc
               "Type": "[TYPE OF CONNECTION (see ReferenceDataType enum)]"
           }
       ],
+      // Configure OpenID Connect (OIDC) authentication if provided; omit to run without OIDC.
+      "OIDCSettings": {
+        "Authority": "[OIDC URL]",
+        "ClientId": "[CLIENT ID]",
+        "ClientSecret": "[CLIENT SECRET]"
+      }
     }
   ```
  
