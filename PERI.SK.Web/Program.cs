@@ -30,33 +30,15 @@ if (builder.Configuration.GetSection("OIDCSettings").Exists())
         builder.Configuration.GetSection("OIDCSettings").Bind(options);
         options.ResponseType = "code";
         options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.RequireSignedTokens = false;
         options.GetClaimsFromUserInfoEndpoint = true;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
-            RequireSignedTokens = false,
-
             NameClaimType = "name",
             RoleClaimType = "role"
         };
 
         options.ProtocolValidator.RequireNonce = false;
-
-        options.Events = new OpenIdConnectEvents
-        {
-            OnRemoteFailure = context =>
-            {
-                // Prevent the default error handler
-                context.HandleResponse();
-
-                // Redirect user back to root
-                context.Response.Redirect("/");
-
-                return Task.CompletedTask;
-            }
-        };
     });
 }
 else
